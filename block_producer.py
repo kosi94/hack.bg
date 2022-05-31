@@ -27,7 +27,6 @@ class LinkedList:
         while node is not None:
             nodes.append(node.data)
             node = node.next
-        nodes.append("None")
 
         return nodes[index]
 
