@@ -9,8 +9,10 @@ print(privatekey.to_string().hex())
 publ=publickey.to_string()
 print(publ.hex())
 
-vk2 = VerifyingKey.from_string(publ, curve=SECP256k1)
-print(vk2)
+
 signature = privatekey.sign(b"Message for ECDSA signing")
 assert publickey.verify(signature, b"Message for ECDSA signing")
+
+vk2 = VerifyingKey.from_string(publ, curve=SECP256k1, hashfunc=sha256)
+print(vk2.verify(signature, b"Message for ECDSA signing"))
 
