@@ -1,46 +1,48 @@
-class Node:
+from _sha256 import sha256
+import time
+import datetime
+import operator
+
+
+list_with_blocks = []
+
+class Block:
     def __init__(self, data):
         self.data = data
-        self.next = None
+        self.timestamp = time.time()
+        if len(list_with_blocks) != 0:
+
+            last_blok = list_with_blocks[-1]
+            self.hash = sha256(bytes(last_blok.hash.hexdigest() + last_blok.data, encoding="utf-8"))
+
+        else:
+            self.hash = sha256("a".encode('utf-8'))
+
+        self.last = None
+        list_with_blocks.append(self)
 
     def __repr__(self):
         return self.data
 
+def find_by_time(time, relation):
+    #2020-07-10 15:00:00.000
+    time = datetime.datetime.fromisoformat(time)
 
-class LinkedList:
-    def __init__(self):
-        self.head = None
-
-    def __repr__(self):
-        node = self.head
-        nodes = []
-        while node is not None:
-            nodes.append(node.data)
-            node = node.next
-        nodes.append("None")
-
-        return " -> ".join(nodes)
-
-    def find_by_index(self, index):
-        node = self.head
-        nodes = []
-        while node is not None:
-            nodes.append(node.data)
-            node = node.next
-
-        return nodes[index]
+    ops = {'>': operator.gt,
+           '<': operator.lt,
+           '>=': operator.ge,
+           '<=': operator.le,
+           '==': operator.eq}
+    
+    for blok in list_with_blocks:
+        if ops[relation](blok.timestamp, time.timestamp()):
+            print(blok)
 
 
-llist = LinkedList()
-print(llist)
+first_Block = Block("a")
+second_Block = Block("b")
+third_Block = Block("c")
+first_Block.last = second_Block
+second_Block.last = third_Block
 
-first_node = Node("a")
-llist.head = first_node
-print(llist)
-
-second_node = Node("b")
-third_node = Node("c")
-first_node.next = second_node
-second_node.next = third_node
-print(llist)
-print(llist.find_by_index(2))
+find_by_time("2022-06-01", ">")
