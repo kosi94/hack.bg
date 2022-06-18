@@ -1,0 +1,23 @@
+Resources:
+
+https://foundation.app
+https://opensea.io/collection/sublimes
+https://docs.opensea.io/docs/metadata-standards
+https://docs.ipfs.io/
+https://www.pinata.cloud/
+https://testnets.opensea.io/assets/rinkeby/0x1675a0b98def90cda1d8503ddbdb3059c808122f/44
+https://github.com/hackbg/chainlink-fullstack/blob/main/packages/hardhat/contracts/RandomSVG.sol
+https://eulerbeats.com/enigma/2237778887424
+https://www.sound.xyz/danielallan/bittersweet-w-deegan
+https://www.hongkiat.com/blog/nft-use-cases/
+https://github.com/m1guelpf/lil-web3/blob/main/src/LilOpenSea.sol
+https://github.com/m1guelpf/lil-web3/blob/main/src/LilFractional.sol
+https://testnets.opensea.io/
+
+Homework:
+
+Deploy an NFT contract from the lecture project (or your own) to Rinkeby and share a link to your collection on OpenSea.
+
+Note: Create deploy script.
+
+Bonus: Optimize contracts.
