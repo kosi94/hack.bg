@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.4;
 
@@ -7,7 +7,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract CompanyNFT is ERC1155, Ownable{
 
-    mapping (uint256 => mapping(address => uint256 )) public balance;
+
+  string public name = "CompanyNFT";
+
+  mapping (uint256 => mapping(address => uint256 )) public balance;
 
   enum NFT_Types {
     OWNER,
@@ -18,7 +21,7 @@ contract CompanyNFT is ERC1155, Ownable{
 
     constructor()
     ERC1155(
-      'https://gateway.pinata.cloud/ipfs/QmWP7BmC3UAXGYLNAHE9jQiNgP4SiiHdkcBJTfEb7upo1i/{id}.txt'
+      'https://gateway.pinata.cloud/ipfs/QmS2heiR4LfbMKwiDarQR8oQc1JgPK8e64saBWRaWv4ytR/{id}.json'
     ){}
 
     function mint(address to,  uint16 nft_type  ) public payable onlyOwner {
