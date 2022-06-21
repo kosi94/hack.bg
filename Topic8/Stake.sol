@@ -30,22 +30,24 @@ contract Stake is ERC20{
     
     function stake(uint256 amount) public {
         require (stakedSTK[msg.sender] == 0);
-        require (balances[msg.sender] > amount);
+        require (balances[msg.sender] >= amount);
         stakedSTK[msg.sender]  += amount;
         balances[msg.sender] -= amount;
         timestampofstaking[msg.sender] = block.timestamp;
+        _burn(msg.sender, amount);
     }
 
     function pricepertoken() public view virtual returns(uint256) {
         return (token_price * block.timestamp) ;
     }
 
-    function unstake(uint256 tokens) public {
-        require (stakedSTK[msg.sender] >= tokens);
-        
-        _mint(msg.sender, uint256 (tokens +  block.timestamp - timestampofstaking[msg.sender]) >> token_price );
+    function unstake(uint256 amount) public {
+        require (stakedSTK[msg.sender] >= amount);
+        //to make it work with  / tokenprice or similar
+        _mint(msg.sender, amount + ( block.timestamp - timestampofstaking[msg.sender])  );
         //_mint(msg.sender,  4  );
-        stakedSTK[msg.sender] -= tokens;
+        stakedSTK[msg.sender] -= amount;
+        balances[msg.sender] += amount;
     }
 }
 
