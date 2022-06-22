@@ -5,14 +5,12 @@ pragma solidity  0.8.4;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract Stake is ERC20{
-    //100000000
-    //165583926200000000
+
     uint64 token_price = 100000000; 
 
 
     mapping (address => uint256) public depositedeth;
     mapping (address => uint256) public stakedSTK;
-    mapping (address => uint256) public balances;
     mapping (address => uint256) public timestampofstaking;
 
     constructor() ERC20("Stake", "STK") public {
@@ -25,14 +23,13 @@ contract Stake is ERC20{
         
         _mint(msg.sender, amount);
         depositedeth[msg.sender] += msg.value;
-        balances[msg.sender] += amount;
+
     }
     
     function stake(uint256 amount) public {
         require (stakedSTK[msg.sender] == 0);
-        require (balances[msg.sender] >= amount);
+        require (balanceOf(msg.sender) >= amount);
         stakedSTK[msg.sender]  += amount;
-        balances[msg.sender] -= amount;
         timestampofstaking[msg.sender] = block.timestamp;
         _burn(msg.sender, amount);
     }
@@ -43,11 +40,26 @@ contract Stake is ERC20{
 
     function unstake(uint256 amount) public {
         require (stakedSTK[msg.sender] >= amount);
-        //to make it work with  / tokenprice or similar
-        _mint(msg.sender, amount + ( block.timestamp - timestampofstaking[msg.sender])  );
-        //_mint(msg.sender,  4  );
+        //Gives 1 token per staked day
+        _mint(msg.sender, amount + (block.timestamp - timestampofstaking[msg.sender]) / 86400 );
+
         stakedSTK[msg.sender] -= amount;
-        balances[msg.sender] += amount;
+    }
+
+    function rewardifunstake (uint amount) public view returns (uint256){
+        require (stakedSTK[msg.sender] >= amount);
+        return amount + (block.timestamp - timestampofstaking[msg.sender]) / 86400 ;
+    }
+
+    function withdraw () public {
+        require (balanceOf(msg.sender) >= 1);
+        // It alows you to withdraw deposited ether based on your minted tokens on the price of tokens before 1 month
+        // 30 days in seconds - 2592000
+        payable(msg.sender).transfer(balanceOf(msg.sender) * (token_price * (block.timestamp - 2592000) ) );
+        _burn(msg.sender, balanceOf(msg.sender));
+    }
+
+    function contractavailableETH() public view returns (uint){
+        return  (address(this).balance);
     }
 }
-
