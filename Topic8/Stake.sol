@@ -5,8 +5,8 @@ pragma solidity  0.8.4;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract Stake is ERC20{
-
-    uint64 token_price = 100000000; 
+    //100000000
+    uint64 token_price = 1; 
 
 
     mapping (address => uint256) public depositedeth;
@@ -18,8 +18,8 @@ contract Stake is ERC20{
     }
 
     function mint(uint256 amount) public payable{
-        //0.16 eth per token at 21/06/2022
-        require (msg.value >= amount * (token_price * block.timestamp )); 
+        //0.16 wei per 1/18 token at 21/06/2022
+        require (msg.value >= amount * (token_price * block.timestamp ), "Insufficient ETH for tx"); 
         
         _mint(msg.sender, amount);
         depositedeth[msg.sender] += msg.value;
@@ -27,8 +27,8 @@ contract Stake is ERC20{
     }
     
     function stake(uint256 amount) public {
-        require (stakedSTK[msg.sender] == 0);
-        require (balanceOf(msg.sender) >= amount);
+        require (stakedSTK[msg.sender] == 0, "Address have staked token STK. Unstake it all first and the you can stake it again");
+        require (balanceOf(msg.sender) >= amount, "Address does not have so many tokens");
         stakedSTK[msg.sender]  += amount;
         timestampofstaking[msg.sender] = block.timestamp;
         _burn(msg.sender, amount);
@@ -39,23 +39,23 @@ contract Stake is ERC20{
     }
 
     function unstake(uint256 amount) public {
-        require (stakedSTK[msg.sender] >= amount);
-        //Gives 1 token per staked day
-        _mint(msg.sender, amount + (block.timestamp - timestampofstaking[msg.sender]) / 86400 );
+        require (stakedSTK[msg.sender] >= amount, "Address does not have staked token STK.");
+        //Gives 1 token per staked second
+        _mint(msg.sender, amount + (block.timestamp - timestampofstaking[msg.sender]) );
 
         stakedSTK[msg.sender] -= amount;
     }
 
     function rewardifunstake (uint amount) public view returns (uint256){
-        require (stakedSTK[msg.sender] >= amount);
-        return amount + (block.timestamp - timestampofstaking[msg.sender]) / 86400 ;
+        require (stakedSTK[msg.sender] >= amount, "Address does not have staked token STK.");
+        return amount + (block.timestamp - timestampofstaking[msg.sender]) ;
     }
 
     function withdraw () public {
-        require (balanceOf(msg.sender) >= 1);
-        // It alows you to withdraw deposited ether based on your minted tokens on the price of tokens before 1 month
-        // 30 days in seconds - 2592000
-        payable(msg.sender).transfer(balanceOf(msg.sender) * (token_price * (block.timestamp - 2592000) ) );
+        require (balanceOf(msg.sender) >= 1, "Address does not have any tokens");
+        // It alows you to withdraw deposited ether based on your minted tokens on the price of tokens after 5 minute
+        // 5 minute in seconds - 300
+        payable(msg.sender).transfer(balanceOf(msg.sender) * (token_price * (block.timestamp + 300) ) );
         _burn(msg.sender, balanceOf(msg.sender));
     }
 
