@@ -32,8 +32,11 @@ export default function Home() {
   const [price, setPrice] = useState(0);
   const [totalSupply, setTotalSupply] = useState(0);
   const [maxSupply, setMaxSupply] = useState(0);
-  const [message, setMessage] = useState("");
   const [tokenURI, setTokenURI] = useState("");
+  const [amount, setAmount] = useState(1);
+  const [newUri, setNewUri] = useState("");
+  const [tokenId, setTokenId] = useState(0);
+  
 
   useEffect(() => {
     const initContract = async () => {
@@ -79,10 +82,10 @@ export default function Home() {
   const handleMint = async () => {
     try {
 	  let pricePerNFT = "10000000000000000";
-	  let priceAmount = BigNumber.from(pricePerNFT).mul(message);
-	  console.log(message);
+	  let priceAmount = BigNumber.from(pricePerNFT).mul(amount);
+	  console.log(amount);
       const options = { value: priceAmount };
-      await contract.mint(message, options);
+      await contract.mint(amount, options);
     } catch (error) {
       console.error(error);
     }
@@ -90,9 +93,7 @@ export default function Home() {
   
     const handleSetBaseURI = async () => {
     try {
-
-      
-      await contract.setBaseURI(message);
+      await contract.setBaseURI(newUri);
     } catch (error) {
       console.error(error);
     }
@@ -122,21 +123,17 @@ export default function Home() {
     const handleTokenURI = async () => {
     try {  
 	  
-      const uri = await contract.tokenURI(message);
+      const uri = await contract.tokenURI(tokenId);
 	  console.log(uri);
 	  setTokenURI(uri);
     } catch (error) {
 
-      console.error("This token", message, " does not exist" );
+      console.error("This token", tokenId, " does not exist" );
 	  console.error(error);
 
     }
   }; 
   
-  const handleInput = (e) => {
-    const msg = e.target.value;
-    setMessage(msg);
-  };
 
   return (
     <Stack>
@@ -183,13 +180,14 @@ export default function Home() {
                 <Input
                   placeholder="Amount to mint"
                   maxLength={20}
-                  onChange={handleInput}
+                  onChange={(e) => setAmount(e.target.value)}
+				  value={amount}
                   w="150px"
                 />
               </Stat>
 			  
             </SimpleGrid>
-            <Button colorScheme="teal" onClick={handleMint} isDisabled={!message}>
+            <Button colorScheme="teal" onClick={handleMint} isDisabled={!amount}>
               Mint
             </Button>
           </Stack>
@@ -212,7 +210,8 @@ export default function Home() {
                 <Input
                   placeholder="New URI"
                   maxLength={200}
-                  onChange={handleInput}
+                  onChange={(e) => setNewUri(e.target.value)}
+				  value={newUri}
                   w="850px"
                 />
               </Stat>
@@ -266,16 +265,15 @@ export default function Home() {
 				                <Input
                   placeholder="TokenURI"
                   maxLength={20}
-                  onChange={handleInput}
+                  onChange={(e) => setTokenId(e.target.value)}
+				  //value={tokenId}
                   w="1150px"
                 />
               </Stat>
 			  
 
-
-					  
             </SimpleGrid>
-            <Button colorScheme="teal" onClick={handleTokenURI} isDisabled={!message}>
+            <Button colorScheme="teal" onClick={handleTokenURI} isDisabled={!tokenId}>
               TokenURI
             </Button>
           </Stack>
