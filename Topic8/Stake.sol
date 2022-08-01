@@ -41,14 +41,14 @@ contract Stake is ERC20{
     function unstake(uint256 amount) public {
         require (stakedSTK[msg.sender] >= amount, "Address does not have staked token STK.");
         //Gives 1 token per staked second
-        _mint(msg.sender, amount + (block.timestamp - timestampofstaking[msg.sender]) );
+        _mint(msg.sender, amount * (block.timestamp - timestampofstaking[msg.sender]) );
 
         stakedSTK[msg.sender] -= amount;
     }
 
     function rewardifunstake (uint amount) public view returns (uint256){
         require (stakedSTK[msg.sender] >= amount, "Address does not have staked token STK.");
-        return amount + (block.timestamp - timestampofstaking[msg.sender]) ;
+        return amount * (block.timestamp - timestampofstaking[msg.sender]) ;
     }
 
     function withdraw () public {
