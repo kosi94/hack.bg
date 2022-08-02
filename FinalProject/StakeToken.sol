@@ -29,7 +29,7 @@ contract StakeToken is ERC20{
         
         _mint(msg.sender, amount);
         depositedeth[msg.sender] += msg.value;
-        staketokenNFT.mint(msg.sender, 1);
+        
     }
     
     function stake(uint256 amount) public {
@@ -38,6 +38,9 @@ contract StakeToken is ERC20{
         stakedSTK[msg.sender]  += amount;
         timestampofstaking[msg.sender] = block.timestamp;
         _burn(msg.sender, amount);
+
+
+        staketokenNFT.mint(msg.sender, calculateNFTType(amount));
     }
 
     function pricepertoken() public view virtual returns(uint256) {
@@ -50,6 +53,16 @@ contract StakeToken is ERC20{
         _mint(msg.sender, amount * (block.timestamp - timestampofstaking[msg.sender]) );
 
         stakedSTK[msg.sender] -= amount;
+
+        //StakeTokenNFT below:
+        staketokenNFT.burn(msg.sender);
+
+        uint16 calculatedNFTType = calculateNFTType(amount);
+        if (calculatedNFTType != 0){
+            staketokenNFT.mint(msg.sender, calculatedNFTType);
+        }
+
+
     }
 
     function rewardifunstake (uint amount) public view returns (uint256){
@@ -68,5 +81,23 @@ contract StakeToken is ERC20{
 
     function contractavailableETH() public view returns (uint){
         return  (address(this).balance);
+    }
+
+
+    uint16 public nft_type ;
+    function calculateNFTType(uint256 amount) public returns(uint16){
+
+        
+        if ( amount > 0 && amount < 11){
+            nft_type = 1;
+        } else if (amount > 10 && amount < 101){
+            nft_type = 2;
+        } else if (amount > 100 && amount < 1001){
+            nft_type = 3;
+        } else if (amount > 1000){
+            nft_type = 4;
+        }
+
+        return nft_type;
     }
 }
