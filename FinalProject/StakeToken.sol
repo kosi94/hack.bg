@@ -10,8 +10,8 @@ contract StakeToken is ERC20{
     address public StakeTokenNFTAddress;
     StakeTokenNFT staketokenNFT;
 
-    //100000000
-    uint64 token_price = 1; 
+    //10000000 is same as 0.00000000001 ETH
+    uint64 token_price = 1; //0.00000000001 ETH  * block.timestamp = 0.01 ETH
 
 
     mapping (address => uint256) public depositedeth;
@@ -47,20 +47,18 @@ contract StakeToken is ERC20{
         return (token_price * block.timestamp) ;
     }
 
-    function unstake(uint256 amount) public {
-        require (stakedSTK[msg.sender] >= amount, "Address does not have staked token STK.");
+    
+    
+    function unstake() public {
+        require (stakedSTK[msg.sender] > 0, "Address does not have staked token STK.");
         //Gives 1 token per staked second
-        _mint(msg.sender, amount * (block.timestamp - timestampofstaking[msg.sender]) );
+        _mint(msg.sender, stakedSTK[msg.sender] * (block.timestamp - timestampofstaking[msg.sender]) );
 
-        stakedSTK[msg.sender] -= amount;
+        stakedSTK[msg.sender] = 0;
 
         //StakeTokenNFT below:
+        
         staketokenNFT.burn(msg.sender);
-
-        uint16 calculatedNFTType = calculateNFTType(amount);
-        if (calculatedNFTType != 0){
-            staketokenNFT.mint(msg.sender, calculatedNFTType);
-        }
 
 
     }
@@ -84,18 +82,18 @@ contract StakeToken is ERC20{
     }
 
 
-    uint16 public nft_type ;
+    
     function calculateNFTType(uint256 amount) public returns(uint16){
 
-        
+        uint16 nft_type ;
         if ( amount > 0 && amount < 11){
-            nft_type = 1;
+            nft_type = 0;
         } else if (amount > 10 && amount < 101){
-            nft_type = 2;
+            nft_type = 1;
         } else if (amount > 100 && amount < 1001){
-            nft_type = 3;
+            nft_type = 2;
         } else if (amount > 1000){
-            nft_type = 4;
+            nft_type = 3;
         }
 
         return nft_type;
