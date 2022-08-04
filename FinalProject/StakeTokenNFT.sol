@@ -14,9 +14,9 @@ contract StakeTokenNFT is ERC1155, Ownable{
 
   enum NFT_Types {
     Crab, //1-10 tokens
-    Octopus, // 10-100
-    Shark, //100-1000
-    Whale //1000 -
+    Octopus, // 11-100
+    Shark, //101-1000
+    Whale //1001 -
   }
 
     constructor()
@@ -37,25 +37,33 @@ contract StakeTokenNFT is ERC1155, Ownable{
         
 
     }
-
-    function burn(address from) external onlyOwner{
+    
+    
+    function burn(address from) external {
       
-      uint16 nft_type ;
-      for (uint16 i=1; i<5; i++){
+      uint16 nft_type;
+      for (uint16 i=0; i<4; i++){
         if (balanceOf(from, i) == 1){
           nft_type = i;
         }
       }
 
+      
       _burn(from, nft_type, 1);
 
     }
-
-
 
     function withdraw () public onlyOwner{
         payable(msg.sender).transfer(address(this).balance);
     }
 
+    function getNFTType(address account) public returns (uint16){
+
+      for (uint16 i = 0; i<4; i++){
+        if (balanceOf(account,i) == 1){
+          return i;
+        }
+      }
+    }
 
 }
