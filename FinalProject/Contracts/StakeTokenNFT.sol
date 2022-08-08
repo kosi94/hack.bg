@@ -21,7 +21,7 @@ contract StakeTokenNFT is ERC1155, Ownable{
 
     constructor()
     ERC1155(
-      'https://gateway.pinata.cloud/ipfs/QmS2heiR4LfbMKwiDarQR8oQc1JgPK8e64saBWRaWv4ytR/{id}.json'
+      'https://gateway.pinata.cloud/ipfs/QmbSAG8WEKZETcYfyCvMdQNXXdCdo3jLn9dbkVnxwD7T28/{id}.json'
     ){}
 
     function mint(address to,  uint16 nft_type  ) external onlyOwner {
