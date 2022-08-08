@@ -71,7 +71,7 @@ contract StakeToken is ERC20{
     function withdraw () public {
         require (balanceOf(msg.sender) >= 1, "Address does not have any tokens");
         // It alows you to withdraw deposited ether based on your minted tokens on the price of tokens after 5 minute
-        // Yes you can manipulate contract by if you withdraw you money before 5 minutes from staking.
+        // Yes you can manipulate contract by if you withdraw your money before 5 minutes from staking.
         // 5 minute in seconds - 300
         payable(msg.sender).transfer(balanceOf(msg.sender) * (token_price * (block.timestamp + 300) ) );
         _burn(msg.sender, balanceOf(msg.sender));
