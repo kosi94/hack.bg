@@ -23,10 +23,9 @@ import { useState, useEffect } from 'react';
 import abi from '../abi/abi.json';
 import abiNFT from "../abi/abiNFT.json"
 
-//stake contract NFT - 0xCc077fF13025883489eBC925170Ba34a9Cf215Ac
-// stake contract - 0xba41f6b2cce0edDDC9d082b0F6e451705D08Af6D
-const nftContractAddress = '0xDa15dBf7006bb9a59cAfe1a5D65761E25D89D806';
-const contractAddress = '0x0162c19D5F2a3A4A6d952CF54F03AEf094df6611';
+
+const nftContractAddress = '0xC5fBDE3581c9e0cf01a9aBAD92143f35B35e8359';
+const contractAddress = '0x3A70639D4Fe72ee4013e90620Fe01248be2378Bd';
 
 export default function Home() {
   const [signer, setSigner] = useState(null);
@@ -43,7 +42,10 @@ export default function Home() {
   const [tokenId, setTokenId] = useState(0);
   const [stake, setStake] = useState(1);
   const [unstake, setUnStake] = useState(1);
-  const [nftType, setNFTType] = useState(null);
+  const [nftType, setNFTType] = useState("");
+  const [rewardIfUnstake, setRewardIfUnstake] = useState(0);
+  const [amountToUnstake, setAmountToUnstake] = useState(0);
+  const [contractAvailableETH, setContractAvalableETH] = useState(0);
   
 
   useEffect(() => {
@@ -214,6 +216,40 @@ export default function Home() {
       console.error("Cannot get nft type for this address", address, error)
     }
   }
+
+
+    const handleRewardIfUnstake = async () => {
+    try {                    
+      
+      const reward = await contract.rewardifunstake(amountToUnstake);
+      
+      setRewardIfUnstake(reward)
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleContractAvailableETH = async () => {
+    try {                    
+      
+      const availableETH = await contract.contractavailableETH();
+      
+      setContractAvalableETH(availableETH)
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleWithdrawETH = async () => {
+    try {                    
+      
+      await contract.withdraw();
+      
+      
+    } catch (error) {
+      console.error(error);
+    }
+  };
   
 
   return (
@@ -361,93 +397,76 @@ export default function Home() {
 
 
 
-
-	  
-	  <Container centerContent maxW="100%">
-        {contract && (
-          <Stack>
-            <Center>
-              <Heading as="h2" size="md">
-                SetBaseURI
-              </Heading>
-            </Center>
-            <SimpleGrid columns={1} spacing={5}>
-
-			  
-			  <Stat border="1px" borderRadius={5} p={3}>
-                <StatLabel>New URI!</StatLabel>
-                <Input
-                  placeholder="New URI"
-                  maxLength={200}
-                  onChange={(e) => setNewUri(e.target.value)}
-				  value={newUri}
-                  w="850px"
-                />
-              </Stat>
-			  
-            </SimpleGrid>
-            <Button colorScheme="teal" onClick={handleSetBaseURI}>
-              SetBaseURI
-            </Button>
-						<Button colorScheme="teal" onClick={reveal}>
-              reveal
-            </Button>
-          </Stack>
-        )}
-      </Container>
-	  
-	  	  <Container centerContent maxW="100%">
-        {contract && (
-          <Stack>
-            <Center>
-              <Heading as="h2" size="md">
-                Contract info
-              </Heading>
-            </Center>
-            <SimpleGrid columns={3} spacing={5}>
-
-
-			  
-            </SimpleGrid>
-            <Button colorScheme="teal" onClick={withdrawEth}>
-              withdrawEth
-            </Button>
-
-			
-          </Stack>
-        )}
-      </Container>
-	  
-	  
       <Container centerContent maxW="100%">
         {contract && (
           <Stack>
             <Center>
               <Heading as="h2" size="md">
-                Contract info
+                Reward if unstake
               </Heading>
             </Center>
-            <SimpleGrid columns={1} spacing={10}>
-              <Stat border="1px" borderRadius={9} p={13}>
-
-                <StatNumber>{tokenURI}</StatNumber>
-				                <Input
-                  placeholder="TokenURI"
+            <SimpleGrid columns={1} spacing={5}>
+              
+              
+            <Stat border="1px" borderRadius={5} p={3}>
+                <StatLabel>Amount to unstake</StatLabel>
+                <Input
+                  placeholder="Amount to unstake"
                   maxLength={20}
-                  onChange={(e) => setTokenId(e.target.value)}
-				  //value={tokenId}
-                  w="1150px"
+                  onChange={(e) => setAmountToUnstake(e.target.value)}
+          value={amountToUnstake}
+                  w="150px"
                 />
               </Stat>
-			  
+
+              <Stat border="1px" borderRadius={5} p={1}>
+                <StatLabel>You will receive</StatLabel>
+                <StatNumber>{`${rewardIfUnstake}`}</StatNumber>
+              </Stat>
+
+
 
             </SimpleGrid>
-            <Button colorScheme="teal" onClick={handleTokenURI} isDisabled={!tokenId}>
-              TokenURI
+            <Button colorScheme="teal" onClick={handleRewardIfUnstake} >
+              Reward if Unstake
             </Button>
           </Stack>
         )}
       </Container>
+
+
+
+      <Container centerContent maxW="100%">
+        {contract && (
+          <Stack>
+            <Center>
+              <Heading as="h2" size="md">
+                Contract Available ETH
+              </Heading>
+            </Center>
+            <SimpleGrid columns={1} spacing={5}>
+              
+              
+              <Stat border="1px" borderRadius={5} p={1}>
+                <StatLabel>Contract Available ETH is:</StatLabel>
+                <StatNumber>{`${contractAvailableETH}`}</StatNumber>
+              </Stat>
+
+
+
+            </SimpleGrid>
+            <Button colorScheme="teal" onClick={handleContractAvailableETH} >
+              Contract Available ETH
+            </Button>
+
+            <Button colorScheme="teal" onClick={handleWithdrawETH} >
+              Withdraw all ETH
+            </Button>
+          </Stack>
+        )}
+      </Container>
+
+	  
 	  
 	  
 	  
