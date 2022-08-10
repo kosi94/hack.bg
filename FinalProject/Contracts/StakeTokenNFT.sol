@@ -5,13 +5,12 @@ pragma solidity 0.8.4;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-
 contract StakeTokenNFT is ERC1155, Ownable{
 
 
   string public name = "StakeTokenNFT";
 
-
+  event TypeNFT(uint16 Type);
   enum NFT_Types {
     Crab, //1-10 tokens
     Octopus, // 11-100
@@ -30,37 +29,27 @@ contract StakeTokenNFT is ERC1155, Ownable{
         'Mint NFT TYPE is incorrect'
         );
 
-
         require (balanceOf(to, nft_type) == 0, 'Cant mint twice same nft_type per addres');
-
         _mint(to, nft_type,  1,  "" );
-        
-
     }
-    
-    
+
     function burn(address from) external {
-      
+
       uint16 nft_type;
       for (uint16 i=0; i<4; i++){
         if (balanceOf(from, i) == 1){
           nft_type = i;
         }
       }
-
-      
       _burn(from, nft_type, 1);
-
     }
 
-    function withdraw () public onlyOwner{
-        payable(msg.sender).transfer(address(this).balance);
-    }
 
     function getNFTType(address account) public returns (uint16){
 
       for (uint16 i = 0; i<4; i++){
         if (balanceOf(account,i) == 1){
+          emit TypeNFT (i);
           return i;
         }
       }
