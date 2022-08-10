@@ -1,10 +1,7 @@
-import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { anyValue } from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import {StakeToken, StakeTokenNFT} from "../typechain-types/contracts";
 import {SignerWithAddress} from "@nomiclabs/hardhat-ethers/signers";
-import {isBigNumber} from "hardhat/common";
 
 describe("StakeToken", function () {
   // We define a fixture to reuse the same setup in every test.
@@ -112,15 +109,64 @@ describe("StakeToken", function () {
 
     })
 
-    it ("Should allow calculate correct NFT types", async function () {
+    it ("Should  return NFT type 3", async function () {
         let amount = 1001;
-        const a = await testToken.calculateNFTType(amount);
-        console.log(a);
         expect (await testToken.calculateNFTType(amount)).to.eq(3)
-        //expect(await testToken.symbol()).to.eq("STK");
 
+    })
+    it ("Should return NFT type 2", async function () {
+        let amount = 532;
+        expect (await testToken.calculateNFTType(amount)).to.eq(2)
+
+    })
+    it ("Should return NFT type 1", async function () {
+        let amount = 59;
+        expect (await testToken.calculateNFTType(amount)).to.eq(1)
+
+    })
+    it ("Should return NFT type 0", async function () {
+        let amount = 6;
+        expect (await testToken.calculateNFTType(amount)).to.eq(0)
+
+    })
+
+
+	it ("Should calculate pricepertoken", async function () {
+        const blockNumBefore = await ethers.provider.getBlockNumber();
+		const blockBefore = await ethers.provider.getBlock(blockNumBefore);
+		const contractPricePerToken = await testToken.pricepertoken();
+		const timestamp = blockBefore.timestamp;
+
+
+        //It may not work properly every time, because difference in time. May differ with one ot two ms.
+		expect (contractPricePerToken ).to.be.above(timestamp )
+
+    })
+
+	it ("Should calculate correct rewardifunstake", async function () {
+
+		let amount = 352514585;
+
+		await testToken.connect(user).mint(amount,{ value: ethers.utils.parseEther("123") })
+        await testToken.connect(user).stake(amount)
+
+		await expect (testToken.connect(user).rewardifunstake(amount))
+            .to.emit(testToken, "RewardIfUnstake")
+
+    })
+
+    it ("Should get correct getNFTType", async function () {
+
+		let amount = 4;
+
+		await testToken.connect(user).mint(amount,{ value: ethers.utils.parseEther("123") })
+        await testToken.connect(user).stake(amount)
+
+        await expect (testTokenNFT.getNFTType(user.address))
+            .to.emit(testTokenNFT, "TypeNFT")
 
 
     })
 
   });
+
