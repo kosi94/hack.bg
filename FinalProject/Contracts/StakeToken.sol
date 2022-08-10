@@ -9,7 +9,7 @@ contract StakeToken is ERC20{
 
     address public StakeTokenNFTAddress;
     StakeTokenNFT staketokenNFT;
-
+    event RewardIfUnstake(uint256 Reward);
     //10000000 is same as 0.00000000001 ETH
     uint64 token_price = 1; //0.00000000001 ETH  * block.timestamp = 0.01 ETH
 
@@ -25,13 +25,14 @@ contract StakeToken is ERC20{
 
     function mint(uint256 amount) public payable{
         //0.16 wei per 1/18 token at 21/06/2022
-        require (msg.value >= amount * (token_price * block.timestamp ), "Insufficient ETH for tx"); 
-        
+
+        require (msg.value >= amount * (token_price * block.timestamp ), "Insufficient ETH for tx");
+
         _mint(msg.sender, amount);
         depositedeth[msg.sender] += msg.value;
-        
+
     }
-    
+
     function stake(uint256 amount) public {
         require (stakedSTK[msg.sender] == 0, "Address have staked token STK. Unstake it all first and the you can stake it again");
         require (balanceOf(msg.sender) >= amount, "Address does not have so many tokens");
@@ -47,8 +48,8 @@ contract StakeToken is ERC20{
         return (token_price * block.timestamp) ;
     }
 
-    
-    
+
+
     function unstake() public {
         require (stakedSTK[msg.sender] > 0, "Address does not have staked token STK.");
         //Gives 1 token per staked second
@@ -57,14 +58,15 @@ contract StakeToken is ERC20{
         stakedSTK[msg.sender] = 0;
 
         //StakeTokenNFT below:
-        
+
         staketokenNFT.burn(msg.sender);
 
 
     }
 
-    function rewardifunstake (uint amount) public view returns (uint256){
+    function rewardifunstake (uint amount) public payable returns (uint256){
         require (stakedSTK[msg.sender] >= amount, "Address does not have staked token STK.");
+        emit RewardIfUnstake(amount * (block.timestamp - timestampofstaking[msg.sender]));
         return amount * (block.timestamp - timestampofstaking[msg.sender]) ;
     }
 
@@ -82,8 +84,8 @@ contract StakeToken is ERC20{
     }
 
 
-    
-    function calculateNFTType(uint256 amount) public returns(uint16){
+
+    function calculateNFTType(uint256 amount) public pure returns(uint16){
 
         uint16 nft_type ;
         if ( amount > 0 && amount < 11){
